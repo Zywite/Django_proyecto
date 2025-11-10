@@ -3,6 +3,7 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Clima</h1>
+    <a href="{% url 'clima_crear' %}" class="btn btn-primary">Registrar Clima</a>
 </div>
 
 <div class="table-responsive">
@@ -13,6 +14,7 @@
                 <th>Temperatura</th>
                 <th>Probabilidad de Lluvia</th>
                 <th>Comentarios</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -22,10 +24,14 @@
                 <td>{{ item.temperatura }}°C</td>
                 <td>{{ item.probabilidad_lluvia }}%</td>
                 <td>{{ item.comentarios }}</td>
+                <td>
+                    <a href="{% url 'clima_editar' item.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                    <a href="{% url 'clima_eliminar' item.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+                </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="4" class="text-center">No hay datos de clima registrados.</td>
+                <td colspan="5" class="text-center">No hay datos de clima registrados.</td>
             </tr>
             {% endfor %}
         </tbody>

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>Historial de Movimientos de Recursos</h1>
+        <a href="{% url 'movimiento_recurso_crear' %}" class="btn btn-primary">Añadir Movimiento</a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Recurso</th>
+                        <th scope="col">Cantidad</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Motivo</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for movimiento in object_list %}
+                    <tr>
+                        <td>{{ movimiento.recurso.nombre }}</td>
+                        <td>{{ movimiento.cantidad }}</td>
+                        <td>{{ movimiento.fecha }}</td>
+                        <td>{{ movimiento.motivo }}</td>
+                        <td>
+                            <a href="{% url 'movimiento_recurso_editar' movimiento.pk %}" class="btn btn-sm btn-info">Editar</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">No hay movimientos registrados todavía.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

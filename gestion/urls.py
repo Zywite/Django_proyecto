@@ -8,7 +8,16 @@ from .views import (
     HabitacionDeleteView,
     ReservaListView,
     RecursoListView,
+    RecursoCreateView,
+    RecursoUpdateView,
+    RecursoDeleteView,
     ClimaListView,
+    ClimaCreateView,
+    ClimaUpdateView,
+    ClimaDeleteView,
+    MovimientoRecursoListView,
+    MovimientoRecursoCreateView,
+    MovimientoRecursoUpdateView,
 )
 
 urlpatterns = [
@@ -19,5 +28,14 @@ urlpatterns = [
     path('habitaciones/<int:pk>/eliminar/', HabitacionDeleteView.as_view(), name='habitacion_eliminar'),
     path('reservas/', ReservaListView.as_view(), name='reserva_list'),
     path('recursos/', RecursoListView.as_view(), name='recurso_list'),
+    path('recursos/crear/', RecursoCreateView.as_view(), name='recurso_crear'),
+    path('recursos/<int:pk>/editar/', RecursoUpdateView.as_view(), name='recurso_editar'),
+    path('recursos/<int:pk>/eliminar/', RecursoDeleteView.as_view(), name='recurso_eliminar'),
     path('clima/', ClimaListView.as_view(), name='clima_list'),
+    path('clima/crear/', ClimaCreateView.as_view(), name='clima_crear'),
+    path('clima/<int:pk>/editar/', ClimaUpdateView.as_view(), name='clima_editar'),
+    path('clima/<int:pk>/eliminar/', ClimaDeleteView.as_view(), name='clima_eliminar'),
+    path('movimientos/', MovimientoRecursoListView.as_view(), name='movimiento_recurso_list'),
+    path('movimientos/crear/', MovimientoRecursoCreateView.as_view(), name='movimiento_recurso_crear'),
+    path('movimientos/<int:pk>/editar/', MovimientoRecursoUpdateView.as_view(), name='movimiento_recurso_editar'),
 ]
