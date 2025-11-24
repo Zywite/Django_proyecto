@@ -1,13 +1,13 @@
 
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
-from django.views.generic import ListView, View
+from django.views.generic import ListView, View, TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from .models import Habitacion, Reserva, Recurso, Clima, MovimientoRecurso, Usuario
-from .forms import HabitacionForm, RecursoForm, MovimientoRecursoForm, ClimaForm, RegistroForm, LoginForm
+from .models import Habitacion, Reserva, Recurso, Clima, MovimientoRecurso, Usuario, Contacto
+from .forms import HabitacionForm, RecursoForm, MovimientoRecursoForm, ClimaForm, RegistroForm, LoginForm, ContactoForm
 
 def index(request):
     num_habitaciones = Habitacion.objects.count()
@@ -141,3 +141,12 @@ def logout_view(request):
     from django.contrib.auth import logout as auth_logout
     auth_logout(request)
     return redirect('login')
+
+class ContactoCreateView(CreateView):
+    model = Contacto
+    form_class = ContactoForm
+    template_name = 'gestion/contacto_form.html'
+    success_url = reverse_lazy('contacto_success')
+
+class ContactoSuccessView(TemplateView):
+    template_name = 'gestion/contacto_success.html'

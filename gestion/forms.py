@@ -1,26 +1,46 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import Habitacion, Recurso, MovimientoRecurso, Clima, Usuario
+from .models import Habitacion, Recurso, MovimientoRecurso, Clima, Usuario, Contacto
 
 class HabitacionForm(forms.ModelForm):
     class Meta:
         model = Habitacion
         fields = '__all__'
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
 
 class RecursoForm(forms.ModelForm):
     class Meta:
         model = Recurso
         fields = '__all__'
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
+
 class MovimientoRecursoForm(forms.ModelForm):
     class Meta:
         model = MovimientoRecurso
         fields = ['recurso', 'cantidad', 'motivo']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
+
 class ClimaForm(forms.ModelForm):
     class Meta:
         model = Clima
         fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
 
 # Formularios de Autenticación
 class RegistroForm(UserCreationForm):
@@ -44,4 +64,14 @@ class LoginForm(AuthenticationForm):
         super().__init__(*args, **kwargs)
         # Añadir clases de Bootstrap a los campos
         for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
+
+class ContactoForm(forms.ModelForm):
+    class Meta:
+        model = Contacto
+        fields = ['nombre', 'email', 'mensaje']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'

@@ -21,6 +21,8 @@ from .views import (
     RegistroView,
     LoginView,
     logout_view,
+    ContactoCreateView,
+    ContactoSuccessView,
 )
 
 urlpatterns = [
@@ -44,4 +46,6 @@ urlpatterns = [
     path('movimientos/', MovimientoRecursoListView.as_view(), name='movimiento_recurso_list'),
     path('movimientos/crear/', MovimientoRecursoCreateView.as_view(), name='movimiento_recurso_crear'),
     path('movimientos/<int:pk>/editar/', MovimientoRecursoUpdateView.as_view(), name='movimiento_recurso_editar'),
+    path('contacto/', ContactoCreateView.as_view(), name='contacto_crear'),
+    path('contacto/exito/', ContactoSuccessView.as_view(), name='contacto_success'),
 ]
