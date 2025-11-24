@@ -3,12 +3,14 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, View, TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from .models import Habitacion, Reserva, Recurso, Clima, MovimientoRecurso, Usuario, Contacto
 from .forms import HabitacionForm, RecursoForm, MovimientoRecursoForm, ClimaForm, RegistroForm, LoginForm, ContactoForm
 
+@login_required
 def index(request):
     num_habitaciones = Habitacion.objects.count()
     num_reservas = Reserva.objects.count()
@@ -22,84 +24,89 @@ def index(request):
 
     return render(request, 'gestion/index.html', context)
 
-class HabitacionListView(ListView):
+class HabitacionListView(LoginRequiredMixin, ListView):
     model = Habitacion
     template_name = 'gestion/habitacion_list.html'
+    ordering = ['numero']
 
-class HabitacionCreateView(CreateView):
+class HabitacionCreateView(LoginRequiredMixin, CreateView):
     model = Habitacion
     form_class = HabitacionForm
     template_name = 'gestion/habitacion_form.html'
     success_url = reverse_lazy('habitacion_list')
 
-class HabitacionUpdateView(UpdateView):
+class HabitacionUpdateView(LoginRequiredMixin, UpdateView):
     model = Habitacion
     form_class = HabitacionForm
     template_name = 'gestion/habitacion_form.html'
     success_url = reverse_lazy('habitacion_list')
 
-class HabitacionDeleteView(DeleteView):
+class HabitacionDeleteView(LoginRequiredMixin, DeleteView):
     model = Habitacion
     template_name = 'gestion/habitacion_confirm_delete.html'
     success_url = reverse_lazy('habitacion_list')
 
-class ReservaListView(ListView):
+class ReservaListView(LoginRequiredMixin, ListView):
     model = Reserva
     template_name = 'gestion/reserva_list.html'
+    ordering = ['-fecha_inicio']
 
-class RecursoListView(ListView):
+class RecursoListView(LoginRequiredMixin, ListView):
     model = Recurso
     template_name = 'gestion/recurso_list.html'
+    ordering = ['nombre']
 
-class RecursoCreateView(CreateView):
+class RecursoCreateView(LoginRequiredMixin, CreateView):
     model = Recurso
     form_class = RecursoForm
     template_name = 'gestion/recurso_form.html'
     success_url = reverse_lazy('recurso_list')
 
-class RecursoUpdateView(UpdateView):
+class RecursoUpdateView(LoginRequiredMixin, UpdateView):
     model = Recurso
     form_class = RecursoForm
     template_name = 'gestion/recurso_form.html'
     success_url = reverse_lazy('recurso_list')
 
-class RecursoDeleteView(DeleteView):
+class RecursoDeleteView(LoginRequiredMixin, DeleteView):
     model = Recurso
     template_name = 'gestion/recurso_confirm_delete.html'
     success_url = reverse_lazy('recurso_list')
 
-class ClimaListView(ListView):
+class ClimaListView(LoginRequiredMixin, ListView):
     model = Clima
     template_name = 'gestion/clima_list.html'
+    ordering = ['-fecha']
 
-class ClimaCreateView(CreateView):
+class ClimaCreateView(LoginRequiredMixin, CreateView):
     model = Clima
     form_class = ClimaForm
     template_name = 'gestion/clima_form.html'
     success_url = reverse_lazy('clima_list')
 
-class ClimaUpdateView(UpdateView):
+class ClimaUpdateView(LoginRequiredMixin, UpdateView):
     model = Clima
     form_class = ClimaForm
     template_name = 'gestion/clima_form.html'
     success_url = reverse_lazy('clima_list')
 
-class ClimaDeleteView(DeleteView):
+class ClimaDeleteView(LoginRequiredMixin, DeleteView):
     model = Clima
     template_name = 'gestion/clima_confirm_delete.html'
     success_url = reverse_lazy('clima_list')
 
-class MovimientoRecursoListView(ListView):
+class MovimientoRecursoListView(LoginRequiredMixin, ListView):
     model = MovimientoRecurso
     template_name = 'gestion/movimiento_recurso_list.html'
+    ordering = ['-fecha']
 
-class MovimientoRecursoCreateView(CreateView):
+class MovimientoRecursoCreateView(LoginRequiredMixin, CreateView):
     model = MovimientoRecurso
     form_class = MovimientoRecursoForm
     template_name = 'gestion/movimiento_recurso_form.html'
     success_url = reverse_lazy('movimiento_recurso_list')
 
-class MovimientoRecursoUpdateView(UpdateView):
+class MovimientoRecursoUpdateView(LoginRequiredMixin, UpdateView):
     model = MovimientoRecurso
     form_class = MovimientoRecursoForm
     template_name = 'gestion/movimiento_recurso_form.html'
