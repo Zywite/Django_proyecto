@@ -21,7 +21,7 @@ Este proyecto es una aplicación web desarrollada en **Django** para la gestión
 
 1.  **Clonar el repositorio** (si aún no lo tienes):
     ```bash
-    git clone <url-del-repositorio>
+    git clone https://github.com/Zywite/Django_proyecto
     cd albergue_project
     ```
 
