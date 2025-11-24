@@ -2,12 +2,12 @@ import os
 import django
 import random
 from datetime import date, timedelta
-
+from gestion.models import Usuario, Habitacion, Reserva, Recurso, Clima, MovimientoRecurso
 # Configurar el entorno de Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'albergue_project.settings')
 django.setup()
 
-from gestion.models import Usuario, Habitacion, Reserva, Recurso, Clima, MovimientoRecurso
+
 
 def populate():
     print("Iniciando script de población de datos...")
