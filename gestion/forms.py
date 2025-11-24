@@ -2,76 +2,106 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import Habitacion, Recurso, MovimientoRecurso, Clima, Usuario, Contacto
 
+
 class HabitacionForm(forms.ModelForm):
+    """
+    Formulario para la creación y edición de habitaciones.
+    """
+
     class Meta:
         model = Habitacion
-        fields = '__all__'
-    
+        fields = "__all__"
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
-            field.widget.attrs['class'] = 'form-control'
+            field.widget.attrs["class"] = "form-control"
+
 
 class RecursoForm(forms.ModelForm):
+    """
+    Formulario para la gestión de recursos.
+    """
+
     class Meta:
         model = Recurso
-        fields = '__all__'
+        fields = "__all__"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
-            field.widget.attrs['class'] = 'form-control'
+            field.widget.attrs["class"] = "form-control"
+
 
 class MovimientoRecursoForm(forms.ModelForm):
+    """
+    Formulario para registrar movimientos de stock.
+    """
+
     class Meta:
         model = MovimientoRecurso
-        fields = ['recurso', 'cantidad', 'motivo']
+        fields = ["recurso", "cantidad", "motivo"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
-            field.widget.attrs['class'] = 'form-control'
+            field.widget.attrs["class"] = "form-control"
+
 
 class ClimaForm(forms.ModelForm):
     class Meta:
         model = Clima
-        fields = '__all__'
+        fields = "__all__"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
-            field.widget.attrs['class'] = 'form-control'
+            field.widget.attrs["class"] = "form-control"
 
-# Formularios de Autenticación
+
 class RegistroForm(UserCreationForm):
-    nombre = forms.CharField(max_length=100, required=True, label='Nombre')
-    apellido = forms.CharField(max_length=100, required=True, label='Apellido')
-    email = forms.EmailField(required=True, label='Email')
-    telefono = forms.CharField(max_length=20, required=False, label='Teléfono')
+    """
+    Formulario extendido de creación de usuarios con campos adicionales.
+    """
+
+    nombre = forms.CharField(max_length=100, required=True, label="Nombre")
+    apellido = forms.CharField(max_length=100, required=True, label="Apellido")
+    email = forms.EmailField(required=True, label="Email")
+    telefono = forms.CharField(max_length=20, required=False, label="Teléfono")
 
     class Meta:
         model = Usuario
-        fields = ('nombre', 'apellido', 'email', 'username', 'telefono', 'password1', 'password2')
+        fields = (
+            "nombre",
+            "apellido",
+            "email",
+            "username",
+            "telefono",
+            "password1",
+            "password2",
+        )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Añadir clases de Bootstrap a los campos
+
         for field_name, field in self.fields.items():
-            field.widget.attrs['class'] = 'form-control'
+            field.widget.attrs["class"] = "form-control"
+
 
 class LoginForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Añadir clases de Bootstrap a los campos
+
         for field_name, field in self.fields.items():
-            field.widget.attrs['class'] = 'form-control'
+            field.widget.attrs["class"] = "form-control"
+
 
 class ContactoForm(forms.ModelForm):
     class Meta:
         model = Contacto
-        fields = ['nombre', 'email', 'mensaje']
+        fields = ["nombre", "email", "mensaje"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
-            field.widget.attrs['class'] = 'form-control'
+            field.widget.attrs["class"] = "form-control"
