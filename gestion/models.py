@@ -3,8 +3,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 class Usuario(AbstractUser):
-    nombre = models.CharField(max_length=100)
-    apellido = models.CharField(max_length=100)
+    nombre = models.CharField(max_length=100, default='')
+    apellido = models.CharField(max_length=100, default='')
     email = models.EmailField(unique=True)
     telefono = models.CharField(max_length=20, blank=True, null=True)
     ROL_CHOICES = (

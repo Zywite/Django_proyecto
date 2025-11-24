@@ -18,10 +18,16 @@ from .views import (
     MovimientoRecursoListView,
     MovimientoRecursoCreateView,
     MovimientoRecursoUpdateView,
+    RegistroView,
+    LoginView,
+    logout_view,
 )
 
 urlpatterns = [
     path('', index, name='index'),
+    path('registro/', RegistroView.as_view(), name='registro'),
+    path('login/', LoginView.as_view(), name='login'),
+    path('logout/', logout_view, name='logout'),
     path('habitaciones/', HabitacionListView.as_view(), name='habitacion_list'),
     path('habitaciones/crear/', HabitacionCreateView.as_view(), name='habitacion_crear'),
     path('habitaciones/<int:pk>/editar/', HabitacionUpdateView.as_view(), name='habitacion_editar'),

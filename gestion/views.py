@@ -1,10 +1,13 @@
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
-from django.views.generic import ListView
+from django.views.generic import ListView, View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from .models import Habitacion, Reserva, Recurso, Clima, MovimientoRecurso
-from .forms import HabitacionForm, RecursoForm, MovimientoRecursoForm, ClimaForm
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from .models import Habitacion, Reserva, Recurso, Clima, MovimientoRecurso, Usuario
+from .forms import HabitacionForm, RecursoForm, MovimientoRecursoForm, ClimaForm, RegistroForm, LoginForm
 
 def index(request):
     num_habitaciones = Habitacion.objects.count()
@@ -101,3 +104,40 @@ class MovimientoRecursoUpdateView(UpdateView):
     form_class = MovimientoRecursoForm
     template_name = 'gestion/movimiento_recurso_form.html'
     success_url = reverse_lazy('movimiento_recurso_list')
+
+
+# ================ VISTAS DE AUTENTICACIÓN ================
+
+class RegistroView(CreateView):
+    model = Usuario
+    form_class = RegistroForm
+    template_name = 'registration/register.html'
+    success_url = reverse_lazy('login')
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        user = form.save()
+        # Después de registrarse, se redirige automáticamente a login
+        return response
+
+
+class LoginView(View):
+    def get(self, request):
+        form = LoginForm()
+        return render(request, 'registration/login.html', {'form': form})
+
+    def post(self, request):
+        form = LoginForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            # Usar la función login de django para crear la sesión
+            from django.contrib.auth import login as auth_login
+            auth_login(request, user)
+            return redirect('index')
+        return render(request, 'registration/login.html', {'form': form})
+
+
+def logout_view(request):
+    from django.contrib.auth import logout as auth_logout
+    auth_logout(request)
+    return redirect('login')
