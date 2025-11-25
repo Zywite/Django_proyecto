@@ -2,81 +2,123 @@ import os
 import django
 import random
 from datetime import date, timedelta
-from gestion.models import (
+from faker import Faker
+
+# Configurar el entorno de Django
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "albergue_project.settings")
+django.setup()
+
+from gestion.models import (  # noqa: E402
     Usuario,
     Habitacion,
     Reserva,
     Recurso,
     Clima,
     MovimientoRecurso,
+    Contacto,
 )
 
+fake = Faker("es_ES")
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "albergue_project.settings")
-django.setup()
+
+def clean_database():
+    """
+    Elimina todos los registros de la base de datos en orden correcto
+    para evitar conflictos de claves foráneas.
+    """
+    print("Limpiando base de datos...")
+
+    # Eliminar primero los modelos que tienen claves foráneas (Hijos)
+    print("- Eliminando Movimientos de Recursos...")
+    MovimientoRecurso.objects.all().delete()
+
+    print("- Eliminando Reservas...")
+    Reserva.objects.all().delete()
+
+    # Eliminar modelos independientes o padres
+    print("- Eliminando Recursos...")
+    Recurso.objects.all().delete()
+
+    print("- Eliminando Habitaciones...")
+    Habitacion.objects.all().delete()
+
+    print("- Eliminando Clima...")
+    Clima.objects.all().delete()
+
+    print("- Eliminando Contactos...")
+    Contacto.objects.all().delete()
+
+    # NO eliminamos usuarios para preservar los existentes
+    # Usuario.objects.all().delete()
+
+    print("Base de datos limpia (excepto usuarios).")
 
 
 def populate():
     """
-    Script para poblar la base de datos con datos de prueba.
-    Crea usuarios, habitaciones, reservas, recursos, movimientos y datos climáticos.
+    Script para poblar la base de datos con datos de prueba usando Faker.
     """
-    print("Iniciando script de población de datos...")
+    clean_database()
+    print("Iniciando script de población de datos con Faker...")
 
+    # --- USUARIOS ---
     print("Creando usuarios...")
-    usuarios_data = [
-        {
-            "username": "admin_user",
-            "email": "admin@example.com",
-            "rol": "administrador",
-            "nombre": "Admin",
-            "apellido": "Principal",
-        },
-        {
-            "username": "cliente1",
-            "email": "cliente1@example.com",
-            "rol": "cliente",
-            "nombre": "Juan",
-            "apellido": "Perez",
-        },
-        {
-            "username": "cliente2",
-            "email": "cliente2@example.com",
-            "rol": "cliente",
-            "nombre": "Maria",
-            "apellido": "Gomez",
-        },
-        {
-            "username": "cliente3",
-            "email": "cliente3@example.com",
-            "rol": "cliente",
-            "nombre": "Carlos",
-            "apellido": "Lopez",
-        },
-    ]
+    # Crear admin si no existe
+    if not Usuario.objects.filter(username="Admin").exists():
+        Usuario.objects.create_user(
+            username="Admin",
+            email="admin@gmail.com",
+            password="Adminpass",
+            rol="administrador",
+            nombre="Admin",
+            apellido="Principal",
+        )
+        print("Usuario admin creado.")
 
+    # Crear clientes falsos
     usuarios_objs = []
-    for u_data in usuarios_data:
-        if not Usuario.objects.filter(username=u_data["username"]).exists():
+    # Recuperar admin
+    try:
+        usuarios_objs.append(Usuario.objects.get(username="Admin"))
+    except Usuario.DoesNotExist:
+        pass
+
+    # Recuperar otros usuarios existentes
+    usuarios_existentes = Usuario.objects.all()
+    if usuarios_existentes:
+        usuarios_objs.extend(list(usuarios_existentes))
+
+    # Crear algunos nuevos si hay pocos
+    if len(usuarios_objs) < 10:
+        for _ in range(5):
+            username = fake.user_name()
+            # Asegurar unicidad de username
+            while Usuario.objects.filter(username=username).exists():
+                username = fake.user_name() + str(random.randint(1, 999))
+
+            email = fake.email()
+
             user = Usuario.objects.create_user(
-                username=u_data["username"],
-                email=u_data["email"],
+                username=username,
+                email=email,
                 password="password123",
-                rol=u_data["rol"],
-                nombre=u_data["nombre"],
-                apellido=u_data["apellido"],
+                rol="cliente",
+                nombre=fake.first_name(),
+                apellido=fake.last_name(),
+                telefono=fake.phone_number(),
             )
             usuarios_objs.append(user)
-            print(f"Usuario creado: {user.username}")
-        else:
-            usuarios_objs.append(Usuario.objects.get(username=u_data["username"]))
-            print(f"Usuario ya existe: {u_data['username']}")
+            print(f"Usuario creado: {username}")
 
+    print(f"Total usuarios disponibles: {len(usuarios_objs)}")
+
+    # --- HABITACIONES ---
     print("Creando habitaciones...")
     tipos = ["individual", "doble", "suite"]
     estados = ["disponible", "ocupada", "mantenimiento"]
 
-    for i in range(101, 111):
+    # Creamos habitaciones fijas (ej. 101-120)
+    for i in range(101, 121):
         numero = str(i)
         if not Habitacion.objects.filter(numero=numero).exists():
             tipo = random.choice(tipos)
@@ -94,28 +136,38 @@ def populate():
                 precio=precio,
                 estado=random.choice(estados),
             )
-            print(f"Habitación creada: {numero}")
+    print("Habitaciones verificadas/creadas.")
 
     habitaciones = list(Habitacion.objects.all())
-
-    print("Creando reservas...")
+    # Filtrar solo clientes para reservas
     clientes = [u for u in usuarios_objs if u.rol == "cliente"]
+
+    # --- RESERVAS ---
+    print("Creando reservas...")
     if clientes and habitaciones:
-        for _ in range(10):
+        for _ in range(20):
             usuario = random.choice(clientes)
             habitacion = random.choice(habitaciones)
-            start_date = date.today() + timedelta(days=random.randint(-10, 30))
+
+            # Fechas aleatorias en los próximos 2 meses o pasados
+            start_date = fake.date_between(start_date="-1M", end_date="+2M")
             end_date = start_date + timedelta(days=random.randint(1, 7))
 
-            Reserva.objects.create(
-                usuario=usuario,
-                habitacion=habitacion,
-                fecha_inicio=start_date,
-                fecha_fin=end_date,
-                estado=random.choice(["pendiente", "confirmada", "cancelada"]),
-            )
-    print("Reservas creadas.")
+            # Intentar crear reserva (puede fallar por validación de solapamiento, lo manejamos)
+            try:
+                Reserva.objects.create(
+                    usuario=usuario,
+                    habitacion=habitacion,
+                    fecha_inicio=start_date,
+                    fecha_fin=end_date,
+                    estado=random.choice(["pendiente", "confirmada", "cancelada"]),
+                )
+            except Exception:
+                # Si choca con otra reserva, simplemente la ignoramos en este script de prueba
+                continue
+    print("Reservas generadas.")
 
+    # --- RECURSOS ---
     print("Creando recursos...")
     recursos_data = [
         {"nombre": "Jabón", "tipo": "consumible", "unidad": "unidades"},
@@ -123,6 +175,8 @@ def populate():
         {"nombre": "Papel Higiénico", "tipo": "consumible", "unidad": "rollos"},
         {"nombre": "Sábanas", "tipo": "reutilizable", "unidad": "juegos"},
         {"nombre": "Detergente", "tipo": "consumible", "unidad": "litros"},
+        {"nombre": "Champú", "tipo": "consumible", "unidad": "botes"},
+        {"nombre": "Almohadas", "tipo": "reutilizable", "unidad": "unidades"},
     ]
 
     recursos_objs = []
@@ -131,44 +185,70 @@ def populate():
             nombre=r_data["nombre"],
             defaults={
                 "tipo": r_data["tipo"],
-                "cantidad_total": random.randint(10, 100),
+                "cantidad_total": random.randint(20, 200),
                 "unidad": r_data["unidad"],
             },
         )
         recursos_objs.append(recurso)
-        if created:
-            print(f"Recurso creado: {recurso.nombre}")
 
+    # --- MOVIMIENTOS DE RECURSOS ---
     print("Creando movimientos de recursos...")
-    for _ in range(15):
+    motivos_recursos = [
+        "Compra mensual de suministros",
+        "Reposición de stock agotado",
+        "Consumo diario de huéspedes",
+        "Ajuste de inventario por merma",
+        "Donación recibida",
+        "Uso en limpieza de habitaciones",
+        "Reemplazo por deterioro",
+        "Compra de emergencia",
+    ]
+    for _ in range(30):
         recurso = random.choice(recursos_objs)
-        cantidad = random.randint(-5, 10)
+        cantidad = random.randint(-10, 20)
         if cantidad == 0:
-            cantidad = 1
+            cantidad = 5
 
         MovimientoRecurso.objects.create(
-            recurso=recurso,
-            cantidad=cantidad,
-            motivo="Reposición" if cantidad > 0 else "Consumo diario",
+            recurso=recurso, cantidad=cantidad, motivo=random.choice(motivos_recursos)
         )
-    print("Movimientos creados.")
+    print("Movimientos generados.")
 
+    # --- CLIMA ---
     print("Creando datos del clima...")
+    comentarios_clima = [
+        "Cielo despejado y soleado.",
+        "Nublado con probabilidad de lluvia.",
+        "Tormentas eléctricas por la tarde.",
+        "Viento fuerte y descenso de temperatura.",
+        "Día agradable con brisa suave.",
+        "Lluvia ligera intermitente.",
+        "Calor intenso, se recomienda hidratación.",
+        "Fresco por la mañana, templado por la tarde.",
+    ]
     base_date = date.today()
-    for i in range(7):
+    for i in range(14):  # Próximas 2 semanas
         fecha = base_date + timedelta(days=i)
         if not Clima.objects.filter(fecha=fecha).exists():
             Clima.objects.create(
                 fecha=fecha,
-                temperatura=random.uniform(15.0, 30.0),
+                temperatura=random.uniform(10.0, 35.0),
                 probabilidad_lluvia=random.randint(0, 100),
-                comentarios="Día soleado"
-                if random.random() > 0.5
-                else "Posibilidad de lluvia",
+                comentarios=random.choice(comentarios_clima),
             )
-    print("Datos del clima creados.")
+    print("Datos del clima generados.")
 
-    print("¡Población de datos completada con éxito!")
+    # --- CONTACTO ---
+    print("Creando mensajes de contacto...")
+    for _ in range(10):
+        Contacto.objects.create(
+            nombre=fake.name(),
+            email=fake.email(),
+            mensaje=fake.text(),
+        )
+    print("Mensajes de contacto generados.")
+
+    print("¡Población de datos con Faker completada con éxito!")
 
 
 if __name__ == "__main__":

@@ -4,6 +4,7 @@ from django.views.generic import ListView, View, TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
+from .mixins import AdminRequiredMixin
 from .models import (
     Habitacion,
     Reserva,
@@ -21,7 +22,9 @@ from .forms import (
     RegistroForm,
     LoginForm,
     ContactoForm,
+    ReservaClienteForm,
 )
+from django.shortcuts import get_object_or_404
 
 
 @login_required
@@ -53,7 +56,7 @@ class HabitacionListView(LoginRequiredMixin, ListView):
     ordering = ["numero"]
 
 
-class HabitacionCreateView(LoginRequiredMixin, CreateView):
+class HabitacionCreateView(AdminRequiredMixin, CreateView):
     """
     Permite registrar una nueva habitación.
     """
@@ -64,14 +67,14 @@ class HabitacionCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy("habitacion_list")
 
 
-class HabitacionUpdateView(LoginRequiredMixin, UpdateView):
+class HabitacionUpdateView(AdminRequiredMixin, UpdateView):
     model = Habitacion
     form_class = HabitacionForm
     template_name = "gestion/habitacion_form.html"
     success_url = reverse_lazy("habitacion_list")
 
 
-class HabitacionDeleteView(LoginRequiredMixin, DeleteView):
+class HabitacionDeleteView(AdminRequiredMixin, DeleteView):
     model = Habitacion
     template_name = "gestion/habitacion_confirm_delete.html"
     success_url = reverse_lazy("habitacion_list")
@@ -86,28 +89,54 @@ class ReservaListView(LoginRequiredMixin, ListView):
     template_name = "gestion/reserva_list.html"
     ordering = ["-fecha_inicio"]
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.request.user.rol != "administrador":
+            queryset = queryset.filter(usuario=self.request.user)
+        return queryset
 
-class RecursoListView(LoginRequiredMixin, ListView):
+
+class ReservaClienteCreateView(LoginRequiredMixin, CreateView):
+    model = Reserva
+    form_class = ReservaClienteForm
+    template_name = "gestion/reserva_form.html"
+    success_url = reverse_lazy("reserva_list")
+
+    def form_valid(self, form):
+        form.instance.usuario = self.request.user
+        habitacion_id = self.kwargs.get("habitacion_id")
+        form.instance.habitacion = get_object_or_404(Habitacion, pk=habitacion_id)
+        form.instance.estado = "pendiente"
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        habitacion_id = self.kwargs.get("habitacion_id")
+        context["habitacion"] = get_object_or_404(Habitacion, pk=habitacion_id)
+        return context
+
+
+class RecursoListView(AdminRequiredMixin, ListView):
     model = Recurso
     template_name = "gestion/recurso_list.html"
     ordering = ["nombre"]
 
 
-class RecursoCreateView(LoginRequiredMixin, CreateView):
+class RecursoCreateView(AdminRequiredMixin, CreateView):
     model = Recurso
     form_class = RecursoForm
     template_name = "gestion/recurso_form.html"
     success_url = reverse_lazy("recurso_list")
 
 
-class RecursoUpdateView(LoginRequiredMixin, UpdateView):
+class RecursoUpdateView(AdminRequiredMixin, UpdateView):
     model = Recurso
     form_class = RecursoForm
     template_name = "gestion/recurso_form.html"
     success_url = reverse_lazy("recurso_list")
 
 
-class RecursoDeleteView(LoginRequiredMixin, DeleteView):
+class RecursoDeleteView(AdminRequiredMixin, DeleteView):
     model = Recurso
     template_name = "gestion/recurso_confirm_delete.html"
     success_url = reverse_lazy("recurso_list")
@@ -119,40 +148,40 @@ class ClimaListView(LoginRequiredMixin, ListView):
     ordering = ["-fecha"]
 
 
-class ClimaCreateView(LoginRequiredMixin, CreateView):
+class ClimaCreateView(AdminRequiredMixin, CreateView):
     model = Clima
     form_class = ClimaForm
     template_name = "gestion/clima_form.html"
     success_url = reverse_lazy("clima_list")
 
 
-class ClimaUpdateView(LoginRequiredMixin, UpdateView):
+class ClimaUpdateView(AdminRequiredMixin, UpdateView):
     model = Clima
     form_class = ClimaForm
     template_name = "gestion/clima_form.html"
     success_url = reverse_lazy("clima_list")
 
 
-class ClimaDeleteView(LoginRequiredMixin, DeleteView):
+class ClimaDeleteView(AdminRequiredMixin, DeleteView):
     model = Clima
     template_name = "gestion/clima_confirm_delete.html"
     success_url = reverse_lazy("clima_list")
 
 
-class MovimientoRecursoListView(LoginRequiredMixin, ListView):
+class MovimientoRecursoListView(AdminRequiredMixin, ListView):
     model = MovimientoRecurso
     template_name = "gestion/movimiento_recurso_list.html"
     ordering = ["-fecha"]
 
 
-class MovimientoRecursoCreateView(LoginRequiredMixin, CreateView):
+class MovimientoRecursoCreateView(AdminRequiredMixin, CreateView):
     model = MovimientoRecurso
     form_class = MovimientoRecursoForm
     template_name = "gestion/movimiento_recurso_form.html"
     success_url = reverse_lazy("movimiento_recurso_list")
 
 
-class MovimientoRecursoUpdateView(LoginRequiredMixin, UpdateView):
+class MovimientoRecursoUpdateView(AdminRequiredMixin, UpdateView):
     model = MovimientoRecurso
     form_class = MovimientoRecursoForm
     template_name = "gestion/movimiento_recurso_form.html"

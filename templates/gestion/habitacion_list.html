@@ -3,7 +3,9 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Habitaciones</h1>
+    {% if user.rol == 'administrador' %}
     <a href="{% url 'habitacion_crear' %}" class="btn btn-primary">Agregar Habitación</a>
+    {% endif %}
 </div>
 
 <div class="table-responsive">
@@ -27,16 +29,22 @@
                 <td>${{ habitacion.precio }}</td>
                 <td>
                     {% if habitacion.estado == 'disponible' %}
-                        <span class="badge bg-success">{{ habitacion.get_estado_display }}</span>
+                    <span class="badge bg-success">{{ habitacion.get_estado_display }}</span>
                     {% elif habitacion.estado == 'ocupada' %}
-                        <span class="badge bg-danger">{{ habitacion.get_estado_display }}</span>
+                    <span class="badge bg-danger">{{ habitacion.get_estado_display }}</span>
                     {% else %}
-                        <span class="badge bg-warning text-dark">{{ habitacion.get_estado_display }}</span>
+                    <span class="badge bg-warning text-dark">{{ habitacion.get_estado_display }}</span>
                     {% endif %}
                 </td>
                 <td>
-                    <a href="{% url 'habitacion_editar' habitacion.pk %}" class="btn btn-sm btn-outline-primary">Editar</a>
-                    <a href="{% url 'habitacion_eliminar' habitacion.pk %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                    {% if user.rol == 'administrador' %}
+                    <a href="{% url 'habitacion_editar' habitacion.pk %}"
+                        class="btn btn-sm btn-outline-primary">Editar</a>
+                    <a href="{% url 'habitacion_eliminar' habitacion.pk %}"
+                        class="btn btn-sm btn-outline-danger">Eliminar</a>
+                    {% else %}
+                    <a href="{% url 'reserva_crear' habitacion.pk %}" class="btn btn-sm btn-success">Reservar</a>
+                    {% endif %}
                 </td>
             </tr>
             {% empty %}

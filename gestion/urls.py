@@ -1,4 +1,3 @@
-
 from django.urls import path
 from .views import (
     index,
@@ -7,6 +6,7 @@ from .views import (
     HabitacionUpdateView,
     HabitacionDeleteView,
     ReservaListView,
+    ReservaClienteCreateView,
     RecursoListView,
     RecursoCreateView,
     RecursoUpdateView,
@@ -26,26 +26,59 @@ from .views import (
 )
 
 urlpatterns = [
-    path('', index, name='index'),
-    path('registro/', RegistroView.as_view(), name='registro'),
-    path('login/', LoginView.as_view(), name='login'),
-    path('logout/', logout_view, name='logout'),
-    path('habitaciones/', HabitacionListView.as_view(), name='habitacion_list'),
-    path('habitaciones/crear/', HabitacionCreateView.as_view(), name='habitacion_crear'),
-    path('habitaciones/<int:pk>/editar/', HabitacionUpdateView.as_view(), name='habitacion_editar'),
-    path('habitaciones/<int:pk>/eliminar/', HabitacionDeleteView.as_view(), name='habitacion_eliminar'),
-    path('reservas/', ReservaListView.as_view(), name='reserva_list'),
-    path('recursos/', RecursoListView.as_view(), name='recurso_list'),
-    path('recursos/crear/', RecursoCreateView.as_view(), name='recurso_crear'),
-    path('recursos/<int:pk>/editar/', RecursoUpdateView.as_view(), name='recurso_editar'),
-    path('recursos/<int:pk>/eliminar/', RecursoDeleteView.as_view(), name='recurso_eliminar'),
-    path('clima/', ClimaListView.as_view(), name='clima_list'),
-    path('clima/crear/', ClimaCreateView.as_view(), name='clima_crear'),
-    path('clima/<int:pk>/editar/', ClimaUpdateView.as_view(), name='clima_editar'),
-    path('clima/<int:pk>/eliminar/', ClimaDeleteView.as_view(), name='clima_eliminar'),
-    path('movimientos/', MovimientoRecursoListView.as_view(), name='movimiento_recurso_list'),
-    path('movimientos/crear/', MovimientoRecursoCreateView.as_view(), name='movimiento_recurso_crear'),
-    path('movimientos/<int:pk>/editar/', MovimientoRecursoUpdateView.as_view(), name='movimiento_recurso_editar'),
-    path('contacto/', ContactoCreateView.as_view(), name='contacto_crear'),
-    path('contacto/exito/', ContactoSuccessView.as_view(), name='contacto_success'),
+    path("", index, name="index"),
+    path("registro/", RegistroView.as_view(), name="registro"),
+    path("login/", LoginView.as_view(), name="login"),
+    path("logout/", logout_view, name="logout"),
+    path("habitaciones/", HabitacionListView.as_view(), name="habitacion_list"),
+    path(
+        "habitaciones/crear/", HabitacionCreateView.as_view(), name="habitacion_crear"
+    ),
+    path(
+        "habitaciones/<int:pk>/editar/",
+        HabitacionUpdateView.as_view(),
+        name="habitacion_editar",
+    ),
+    path(
+        "habitaciones/<int:pk>/eliminar/",
+        HabitacionDeleteView.as_view(),
+        name="habitacion_eliminar",
+    ),
+    path("reservas/", ReservaListView.as_view(), name="reserva_list"),
+    path(
+        "reservas/crear/<int:habitacion_id>/",
+        ReservaClienteCreateView.as_view(),
+        name="reserva_crear",
+    ),
+    path("recursos/", RecursoListView.as_view(), name="recurso_list"),
+    path("recursos/crear/", RecursoCreateView.as_view(), name="recurso_crear"),
+    path(
+        "recursos/<int:pk>/editar/", RecursoUpdateView.as_view(), name="recurso_editar"
+    ),
+    path(
+        "recursos/<int:pk>/eliminar/",
+        RecursoDeleteView.as_view(),
+        name="recurso_eliminar",
+    ),
+    path("clima/", ClimaListView.as_view(), name="clima_list"),
+    path("clima/crear/", ClimaCreateView.as_view(), name="clima_crear"),
+    path("clima/<int:pk>/editar/", ClimaUpdateView.as_view(), name="clima_editar"),
+    path("clima/<int:pk>/eliminar/", ClimaDeleteView.as_view(), name="clima_eliminar"),
+    path(
+        "movimientos/",
+        MovimientoRecursoListView.as_view(),
+        name="movimiento_recurso_list",
+    ),
+    path(
+        "movimientos/crear/",
+        MovimientoRecursoCreateView.as_view(),
+        name="movimiento_recurso_crear",
+    ),
+    path(
+        "movimientos/<int:pk>/editar/",
+        MovimientoRecursoUpdateView.as_view(),
+        name="movimiento_recurso_editar",
+    ),
+    path("contacto/", ContactoCreateView.as_view(), name="contacto_crear"),
+    path("contacto/exito/", ContactoSuccessView.as_view(), name="contacto_success"),
 ]

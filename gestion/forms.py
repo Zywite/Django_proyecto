@@ -1,6 +1,14 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import Habitacion, Recurso, MovimientoRecurso, Clima, Usuario, Contacto
+from .models import (
+    Habitacion,
+    Recurso,
+    MovimientoRecurso,
+    Clima,
+    Usuario,
+    Contacto,
+    Reserva,
+)
 
 
 class HabitacionForm(forms.ModelForm):
@@ -87,6 +95,13 @@ class RegistroForm(UserCreationForm):
         for field_name, field in self.fields.items():
             field.widget.attrs["class"] = "form-control"
 
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.rol = "cliente"  # Asignar rol de cliente por defecto
+        if commit:
+            user.save()
+        return user
+
 
 class LoginForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
@@ -105,3 +120,17 @@ class ContactoForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs["class"] = "form-control"
+
+
+class ReservaClienteForm(forms.ModelForm):
+    class Meta:
+        model = Reserva
+        fields = ["fecha_inicio", "fecha_fin"]
+        widgets = {
+            "fecha_inicio": forms.DateInput(
+                attrs={"type": "date", "class": "form-control"}
+            ),
+            "fecha_fin": forms.DateInput(
+                attrs={"type": "date", "class": "form-control"}
+            ),
+        }

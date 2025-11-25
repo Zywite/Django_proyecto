@@ -32,6 +32,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'reserva_list' %}">Reservas</a>
                     </li>
+                    {% if user.rol == 'administrador' %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'recurso_list' %}">Recursos</a>
                     </li>
@@ -41,6 +42,11 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'movimiento_recurso_list' %}">Movimientos</a>
                     </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'clima_list' %}">Clima</a>
+                    </li>
+                    {% endif %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'contacto_crear' %}">Contacto</a>
                     </li>
